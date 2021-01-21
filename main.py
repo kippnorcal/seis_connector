@@ -7,18 +7,12 @@ from sqlsorcery import MSSQL
 import config
 from mailer import Mailer
 
+from ftp import FTP
+
 # Pull file from FTP to local
-
-
 # Archive files in FTP
-
-
 # Transform files from FTP into dataframe
-
-
 # [TBD] Compare file from FTP to what's in our database; write errors somewhere
-
-
 # Import into database
 
 class Connector:
@@ -29,12 +23,15 @@ class Connector:
 
     def __init__(self):
         self.sql = MSSQL()
+        self.ftp = FTP()
 
+    #Must include 'self' in the paranthesis so you can call anything in the class earlier
+    def readftp(self):
+        self.ftp.testFTP("seis")
 
 def main():
     config.set_logging()
     connector = Connector()
-
 
 if __name__ == "__main__":
     try:
