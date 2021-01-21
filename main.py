@@ -7,6 +7,19 @@ from sqlsorcery import MSSQL
 import config
 from mailer import Mailer
 
+# Pull file from FTP to local
+
+
+# Archive files in FTP
+
+
+# Transform files from FTP into dataframe
+
+
+# [TBD] Compare file from FTP to what's in our database; write errors somewhere
+
+
+# Import into database
 
 class Connector:
     """
@@ -31,4 +44,4 @@ if __name__ == "__main__":
         logging.exception(e)
         error_message = traceback.format_exc()
     if config.ENABLE_MAILER:
-        Mailer("PROJECT NAME GOES HERE").notify(error_message=error_message)
+        Mailer("SEIS Connector").notify(error_message=error_message)
