@@ -29,6 +29,10 @@ DB_USER=
 DB_PWD=
 DB_SCHEMA=
 
+# FTP variables
+FTP_Hostname=
+FTP_Username=
+FTP_PWD=
 
 # Email Credentials (Optional)
 ENABLE_MAILER=1
