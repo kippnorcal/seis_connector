@@ -47,6 +47,6 @@ DEBUG=1
 ## Running the job
 
 ```
-$ docker build -t <repo_name> .
-$ docker run --rm -it <repo_name>
+$ docker build -t seis_connector .
+$ docker run --rm -it seis_connector
 ```
