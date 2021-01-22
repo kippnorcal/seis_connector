@@ -49,4 +49,5 @@ DEBUG=1
 ```
 $ docker build -t seis_connector .
 $ docker run --rm -it seis_connector
+$ docker run --rm -it -v ${PWD}:/code/ seis_connector
 ```
