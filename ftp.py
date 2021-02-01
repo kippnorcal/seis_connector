@@ -7,8 +7,8 @@ class FTP:
 
     # init initializes the class. Once you create an object, it will run through all the init lines
     def __init__(self):
-        FTP_HOST = os.getenv("FTP_Hostname")
-        FTP_USER = os.getenv("FTP_Username")
+        FTP_HOST = os.getenv("FTP_HOST")
+        FTP_USER = os.getenv("FTP_USER")
         FTP_PWD = os.getenv("FTP_PWD")
 
         self.cnopts = pysftp.CnOpts()
