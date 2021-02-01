@@ -1,5 +1,5 @@
 # repo_name
-Description goes here
+ETL pipeline that pulls student demographic and services data from SEIS (SPED platform) into the data warehouse.
 
 ## Dependencies:
 
@@ -14,7 +14,7 @@ Description goes here
 1. Clone this repo
 
 ```
-git clone https://github.com/kippnorcal/<this_repo>.git
+git clone https://github.com/kippnorcal/seis_connector.git
 ```
 
 2. Create .env file with project secrets
@@ -30,8 +30,8 @@ DB_PWD=
 DB_SCHEMA=
 
 # FTP variables
-FTP_Hostname=
-FTP_Username=
+FTP_HOST=
+FTP_USER=
 FTP_PWD=
 
 # Email Credentials (Optional)
@@ -44,10 +44,18 @@ RECIPIENT_EMAIL=
 DEBUG=1
 ```
 
-## Running the job
+## Build the Docker image
 
 ```
-$ docker build -t seis_connector .
-$ docker run --rm -it seis_connector
-$ docker run --rm -it -v ${PWD}:/code/ seis_connector
+$ docker build -t seis .
+```
+
+## Run the job
+```
+$ docker run --rm -it seis
+```
+
+## Run the job with volume mapping
+```
+$ docker run --rm -it -v ${PWD}:/code/ seis
 ```
