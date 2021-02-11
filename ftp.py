@@ -1,12 +1,14 @@
 import os
-import sys
 import pysftp
+import sys
 
-# A class groups functions with a similar objective
+import config
+
 class FTP:
-
-    # init initializes the class. Once you create an object, it will run through all the init lines
     def __init__(self):
+        """
+        Initialize FTP connection using pysftp.
+        """
         FTP_HOST = os.getenv("FTP_HOST")
         FTP_USER = os.getenv("FTP_USER")
         FTP_PWD = os.getenv("FTP_PWD")
@@ -17,25 +19,20 @@ class FTP:
             host=FTP_HOST, username=FTP_USER, password=FTP_PWD, cnopts=self.cnopts
         )
 
-    def testFTP(self, remotedir):
-        self.data = self.ftpsrv.listdir(remotedir)
-        self.ftpsrv.close()
+    def download_all(self, remotedir, localdir):
+        """
+        Recursively loop through all directories and get the two csv files.
+        """
+        file_names = ["Student.csv", "Service.csv"]
+        for school in config.sftp_directory_names():
+            for file_name in file_names:
+                self.ftpsrv.get(
+                    f"{remotedir}/{school}/{file_name}", 
+                    f"{localdir}/{school}_{file_name}",
+                    preserve_mtime=True
+                )
+                # TODO throw error if file not found
 
-        for i in self.data:
-            print(i)
-
-        return 1
-
-    def download_all_files(self, sourcedir, destinationdir):
-        self.sourcedir = sourcedir
-        result = self.ftpsrv.get_d(self.sourcedir, destinationdir, preserve_mtime=True)
-
-    def delete_files_remotedir(self, remotedir):
-        self.remotefiles = self.ftpsrv.listdir(remotedir)
-        if len(self.remotefiles) > 0:
-            for filename in self.remotefiles:
-                self.ftpsrv.remove(f"{remotedir}/{filename}")
-    
     def _archive_file(self, file):
         """
         Place the file in an 'archive' folder within its directory.
