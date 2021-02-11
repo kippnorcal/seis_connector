@@ -2,6 +2,7 @@ import logging
 import traceback
 import os
 
+import numpy as np
 import pandas as pd
 from sqlsorcery import MSSQL
 
@@ -20,6 +21,7 @@ class Connector:
         self.ftp = FTP()
         self.localdir = "files"
         self.remotedir = "seis"
+        self.schools = config.DIRECTORY_NAMES
         
     def remove_local_files(self):
         """
@@ -35,31 +37,44 @@ class Connector:
         Loop through folders and download files from FTP.
         """
         self.remove_local_files()
-        self.ftp.download_all(self.remotedir, self.localdir, config.file_names())
+        self.ftp.download_all(self.remotedir, self.localdir, config.FILE_NAMES)
         self.filenames = [f for f in os.listdir(self.localdir) if f.endswith(".csv")]
         logging.info(f"{len(self.filenames)} files downloaded. ")
     
-    def read_into_df(self):
+    def read_files_into_df(self, file_name):
+        """
+        Given the file name (Student or Service), read the files and concat into one DataFrame.
+        """
         dfs = []
-        for filename in self.filenames:
-            # path = f"{self.localdir}/{filename}"
-            path = os.path.join(self.localdir, filename)
+        for school in self.schools:
+            path = os.path.join(self.localdir, f"{school}_{file_name}.csv")
             df = pd.read_csv(
                 path, sep=",", quotechar='"', doublequote=True, dtype=str, header=0
             )
-            print(df)
             dfs.append(df)
-        # df.fillna(value=nan_fields, inplace=True)
+        merged = pd.concat(dfs)
+        merged.replace(np.nan, "", regex=True, inplace=True)
+        return merged
     
-    def archive_files(self):
-        self.ftp.archive_remote_files(self.remotedir)
+    # def archive_files(self):
+    #     self.ftp.archive_remote_files(self.remotedir)
+
+    def insert_df_into_db(self, df, table_name):
+        """
+        Insert DataFrame into database with given table name.
+        """
+        table = f"{config.TABLE_PREFIX}_{table_name}"
+        self.sql.insert_into(table, df, if_exists="replace")
+        logging.info(f"Inserted {len(df)} records into {table}.")
 
 def main():
     config.set_logging()
     connector = Connector()
     connector.get_files_from_ftp()
-    # connector.read_into_df()
-    # connector.archive_files()
+    students = connector.read_files_into_df("Student")
+    services = connector.read_files_into_df("Service")
+    connector.insert_df_into_db(students, "Students")
+    connector.insert_df_into_db(services, "Services")
 
     # Pull file from FTP to local
     # Confirm that files have been downloaded; if not, throw an error
