@@ -23,7 +23,7 @@ class FTP:
         """
         Recursively loop through all directories and get the two csv files.
         """
-        for school in config.sftp_directory_names():
+        for school in config.DIRECTORY_NAMES:
             for file_name in file_names:
                 self.ftpsrv.get(
                     f"{remotedir}/{school}/{file_name}", 
