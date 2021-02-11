@@ -19,11 +19,10 @@ class FTP:
             host=FTP_HOST, username=FTP_USER, password=FTP_PWD, cnopts=self.cnopts
         )
 
-    def download_all(self, remotedir, localdir):
+    def download_all(self, remotedir, localdir, file_names):
         """
         Recursively loop through all directories and get the two csv files.
         """
-        file_names = ["Student.csv", "Service.csv"]
         for school in config.sftp_directory_names():
             for file_name in file_names:
                 self.ftpsrv.get(

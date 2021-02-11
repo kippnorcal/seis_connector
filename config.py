@@ -45,3 +45,6 @@ def sftp_directory_names():
         , "KIPP Valiant Community Prep"
     ]
     return directory_names
+
+def file_names():
+    return ["Student.csv", "Service.csv"]
