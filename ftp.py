@@ -33,7 +33,6 @@ class FTP:
                     f"{localdir}/{school}_{file_name}",
                     preserve_mtime=True,
                 )
-                # TODO throw error if file not found
 
     def _archive_file(self, file):
         """
