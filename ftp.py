@@ -5,7 +5,7 @@ import sys
 import config
 
 class FTP:
-    def __init__(self):
+    def __init__(self, directory_names):
         """
         Initialize FTP connection using pysftp.
         """
@@ -18,13 +18,16 @@ class FTP:
         self.ftpsrv = pysftp.Connection(
             host=FTP_HOST, username=FTP_USER, password=FTP_PWD, cnopts=self.cnopts
         )
+        self.file_names = ["Student.csv", "Service.csv"]
+        self.directory_names = directory_names
 
-    def download_all(self, remotedir, localdir, file_names):
+
+    def download_all(self, remotedir, localdir):
         """
         Recursively loop through all directories and get the two csv files.
         """
-        for school in config.DIRECTORY_NAMES:
-            for file_name in file_names:
+        for school in self.directory_names:
+            for file_name in self.file_names:
                 self.ftpsrv.get(
                     f"{remotedir}/{school}/{file_name}", 
                     f"{localdir}/{school}_{file_name}",

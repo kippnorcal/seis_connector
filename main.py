@@ -18,10 +18,27 @@ class Connector:
 
     def __init__(self):
         self.sql = MSSQL()
-        self.ftp = FTP()
+        self.schools = [
+            "KIPP Bayview Academy"
+            , "KIPP Bayview Elementary"
+            , "KIPP Bridge Academy"
+            , "KIPP Esperanza High School"
+            , "KIPP Excelencia Community Prep"
+            , "KIPP Heartwood Academy"
+            , "KIPP Heritage Academy"
+            , "KIPP King Collegiate"
+            , "KIPP Navigate College Prep"
+            , "KIPP Prize Preparatory Academy"
+            , "KIPP San Francisco Bay Academy"
+            , "KIPP San Francisco College Preparatory"
+            , "KIPP San Jose Collegiate"
+            , "KIPP Summit Academy"
+            , "KIPP Valiant Community Prep"
+        ]
+        self.ftp = FTP(self.schools)
         self.localdir = "files"
         self.remotedir = "seis"
-        self.schools = config.DIRECTORY_NAMES
+        self.table_prefix = "SEIS"
         
     def remove_local_files(self):
         """
@@ -37,7 +54,7 @@ class Connector:
         Loop through folders and download files from FTP.
         """
         self.remove_local_files()
-        self.ftp.download_all(self.remotedir, self.localdir, config.FILE_NAMES)
+        self.ftp.download_all(self.remotedir, self.localdir)
         self.filenames = [f for f in os.listdir(self.localdir) if f.endswith(".csv")]
         logging.info(f"{len(self.filenames)} files downloaded. ")
     
@@ -56,14 +73,11 @@ class Connector:
         merged.replace(np.nan, "", regex=True, inplace=True)
         return merged
     
-    # def archive_files(self):
-    #     self.ftp.archive_remote_files(self.remotedir)
-
     def insert_df_into_db(self, df, table_name):
         """
         Insert DataFrame into database with given table name.
         """
-        table = f"{config.TABLE_PREFIX}_{table_name}"
+        table = f"{self.table_prefix}_{table_name}"
         self.sql.insert_into(table, df, if_exists="replace")
         logging.info(f"Inserted {len(df)} records into {table}.")
 
@@ -75,13 +89,6 @@ def main():
     services = connector.read_files_into_df("Service")
     connector.insert_df_into_db(students, "Students")
     connector.insert_df_into_db(services, "Services")
-
-    # Pull file from FTP to local
-    # Confirm that files have been downloaded; if not, throw an error
-    # Archive files in FTP
-    # Transform files from FTP into dataframe
-    # [TBD] Compare file from FTP to what's in our database; write errors somewhere
-    # Import into database
 
 if __name__ == "__main__":
     try:
