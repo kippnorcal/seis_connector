@@ -4,6 +4,7 @@ import sys
 
 import config
 
+
 class FTP:
     def __init__(self, directory_names):
         """
@@ -21,7 +22,6 @@ class FTP:
         self.file_names = ["Student.csv", "Service.csv"]
         self.directory_names = directory_names
 
-
     def download_all(self, remotedir, localdir):
         """
         Recursively loop through all directories and get the two csv files.
@@ -29,16 +29,16 @@ class FTP:
         for school in self.directory_names:
             for file_name in self.file_names:
                 self.ftpsrv.get(
-                    f"{remotedir}/{school}/{file_name}", 
+                    f"{remotedir}/{school}/{file_name}",
                     f"{localdir}/{school}_{file_name}",
-                    preserve_mtime=True
+                    preserve_mtime=True,
                 )
                 # TODO throw error if file not found
 
     def _archive_file(self, file):
         """
         Place the file in an 'archive' folder within its directory.
-        :param file: Path and name of the file that will be archived. 
+        :param file: Path and name of the file that will be archived.
         :type file: String
         """
         self.ftpsrv.rename(
@@ -48,15 +48,15 @@ class FTP:
     def _do_nothing(self, file):
         """
         Used for files and unknown file types.
-        :param file: Path and name of the file that will be ignored. 
+        :param file: Path and name of the file that will be ignored.
         :type file: String
         """
         pass
 
     def archive_remote_files(self, remotedir):
         """
-        Archive all of the files in the specified remote directory. 
-        
+        Archive all of the files in the specified remote directory.
+
         :param remotedir: Path of the remote directory (ie. the FTP directory)
         :type remotedir: String
         """

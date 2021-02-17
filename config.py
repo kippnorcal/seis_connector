@@ -10,6 +10,7 @@ ARGS, _ = parser.parse_known_args()
 ENABLE_MAILER = int(os.getenv("ENABLE_MAILER", default=0))
 DEBUG = ARGS.debug or int(os.getenv("DEBUG", default=0))
 
+
 def set_logging():
     """Configure logging level and outputs"""
     logging.basicConfig(

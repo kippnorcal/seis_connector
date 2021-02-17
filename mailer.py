@@ -9,9 +9,9 @@ from email.mime.text import MIMEText
 class Mailer:
     """
     A mail server connection object for sending email notifications.
-    
+
     Params:
-        jobname:    The name of the job to be referenced in the emails.     
+        jobname:    The name of the job to be referenced in the emails.
     """
 
     def __init__(self, jobname):
