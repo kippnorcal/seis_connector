@@ -19,27 +19,11 @@ class Connector:
 
     def __init__(self):
         self.sql = MSSQL()
-        self.schools = [
-            "KIPP Bayview Academy",
-            "KIPP Bayview Elementary",
-            "KIPP Bridge Academy",
-            "KIPP Esperanza High School",
-            "KIPP Excelencia Community Prep",
-            "KIPP Heartwood Academy",
-            "KIPP Heritage Academy",
-            "KIPP King Collegiate",
-            "KIPP Navigate College Prep",
-            "KIPP Prize Preparatory Academy",
-            "KIPP San Francisco Bay Academy",
-            "KIPP San Francisco College Preparatory",
-            "KIPP San Jose Collegiate",
-            "KIPP Summit Academy",
-            "KIPP Valiant Community Prep",
-        ]
-        self.ftp = FTP(self.schools)
+        self.ftp = FTP()
         self.localdir = "files"
         self.remotedir = "seis"
         self.table_prefix = "SEIS"
+        self.schools = self.ftp.get_directory_names(self.remotedir)
 
     def remove_local_files(self):
         """

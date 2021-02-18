@@ -6,21 +6,25 @@ import config
 
 
 class FTP:
-    def __init__(self, directory_names):
+    def __init__(self):
         """
         Initialize FTP connection using pysftp.
         """
-        FTP_HOST = os.getenv("FTP_HOST")
-        FTP_USER = os.getenv("FTP_USER")
-        FTP_PWD = os.getenv("FTP_PWD")
-
         self.cnopts = pysftp.CnOpts()
         self.cnopts.hostkeys = None
         self.ftpsrv = pysftp.Connection(
-            host=FTP_HOST, username=FTP_USER, password=FTP_PWD, cnopts=self.cnopts
+            host=config.FTP_HOST, username=config.FTP_USER, password=config.FTP_PWD, cnopts=self.cnopts
         )
         self.file_names = ["Student.csv", "Service.csv"]
-        self.directory_names = directory_names
+
+    def get_directory_names(self, remotedir):
+        """
+        Return a list of all the directory names.
+        
+        For SEIS, the directory names are the school names.
+        """
+        self.directory_names = self.ftpsrv.listdir(remotedir)
+        return self.directory_names
 
     def download_all(self, remotedir, localdir):
         """

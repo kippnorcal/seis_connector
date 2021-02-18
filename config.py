@@ -10,6 +10,10 @@ ARGS, _ = parser.parse_known_args()
 ENABLE_MAILER = int(os.getenv("ENABLE_MAILER", default=0))
 DEBUG = ARGS.debug or int(os.getenv("DEBUG", default=0))
 
+FTP_HOST = os.getenv("FTP_HOST")
+FTP_USER = os.getenv("FTP_USER")
+FTP_PWD = os.getenv("FTP_PWD")
+
 
 def set_logging():
     """Configure logging level and outputs"""
