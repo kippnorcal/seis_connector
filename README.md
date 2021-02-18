@@ -1,4 +1,4 @@
-# repo_name
+# seis_connector
 ETL pipeline that pulls student demographic and services data from SEIS (SPED platform) into the data warehouse.
 
 ## Dependencies:
