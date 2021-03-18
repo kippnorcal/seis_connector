@@ -26,18 +26,14 @@ class Connector:
         self.schools = self.ftp.get_directory_names(self.remotedir)
 
     def remove_local_files(self):
-        """
-        Remove any leftover files from local project directory.
-        """
+        """Remove any leftover files from local project directory."""
         filelist = [f for f in os.listdir(self.localdir)]
         for filename in filelist:
             if "gitkeep" not in filename:
                 os.remove(os.path.join(self.localdir, filename))
 
     def get_files_from_ftp(self):
-        """
-        Loop through folders and download files from FTP.
-        """
+        """Loop through all sub-folders and download files from FTP."""
         self.remove_local_files()
         self.ftp.download_all(self.remotedir, self.localdir)
         self.filenames = [f for f in os.listdir(self.localdir) if f.endswith(".csv")]
@@ -45,7 +41,13 @@ class Connector:
 
     def read_files_into_df(self, file_name):
         """
-        Given the file name (Student or Service), read the files and concat into one DataFrame.
+        Given the file name (eg. Student or Service), read the files and concat into one DataFrame.
+
+        Params:
+            file_name (str): name of the file that you are trying to combine.
+
+        Return:
+            DataFrame: combined data from all files with the same name (ie. same type of data)
         """
         dfs = []
         for school in self.schools:
@@ -61,6 +63,13 @@ class Connector:
     def insert_df_into_db(self, df, table_name):
         """
         Insert DataFrame into database with given table name.
+
+        Params:
+            df (DataFrame): data to insert into the database.
+            table_name (str): name of the database table that you want to update.
+
+        Return:
+            none
         """
         table = f"{self.table_prefix}_{table_name}"
         self.sql.insert_into(table, df, if_exists="replace")

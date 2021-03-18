@@ -1,5 +1,12 @@
 # seis_connector
-ETL pipeline that pulls student demographic and services data from SEIS (SPED platform) into the data warehouse.
+ETL pipeline that pulls student demographic and services data from SEIS ([Special Education Information System](https://www.sjcoe.org/CodeStack/SEIS.aspx)) into the data warehouse. This code does a full truncate and reload of the database tables and does not track changes over time.
+
+## Pre-requisites:
+This connector iteratively pulls files from an SFTP server. In order to use this code, you will need to have an SFTP server that is already set up and contains the SEIS files.
+
+In the SFTP directory, each school has its own sub-directory, and files are dropped into each school's folder nightly. This automated data file export is set up in partnership with the [San Joaquin County Office of Education (SJCOE) SEIS team](https://www.sjcoe.org/CodeStack/SEIS.aspx).
+
+Note: SEIS drops three different file formats with the same data (.csv, .txt, .xml), and this script is only processing the .csv files.
 
 ## Dependencies:
 
