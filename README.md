@@ -66,3 +66,12 @@ $ docker run --rm -it seis
 ```
 $ docker run --rm -it -v ${PWD}:/code/ seis
 ```
+
+## Annual maintenance
+When new schools are opened, the SELPA creates a SEIS account for them.
+
+Data in SEIS is imported/entered manually by the Special Ed team.
+
+In order to get the FTP file drop set up for a new school, you need to connect with the SJCOE SEIS team. They will set up an integration account and set up the file export format.
+
+Once you're logged in, you will need to create a new school directory on our SFTP server, and then add our SFTP connection info to the SEIS integration setup page.
