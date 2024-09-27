@@ -1,9 +1,10 @@
 import os
 import pysftp
-import sys
 
-import config
 
+FTP_HOST = os.getenv("FTP_HOST")
+FTP_USER = os.getenv("FTP_USER")
+FTP_PWD = os.getenv("FTP_PWD")
 
 class FTP:
     """
@@ -17,9 +18,9 @@ class FTP:
         self.cnopts = pysftp.CnOpts()
         self.cnopts.hostkeys = None
         self.ftpsrv = pysftp.Connection(
-            host=config.FTP_HOST,
-            username=config.FTP_USER,
-            password=config.FTP_PWD,
+            host=FTP_HOST,
+            username=FTP_USER,
+            password=FTP_PWD,
             cnopts=self.cnopts,
         )
         self.file_names = ["Student.csv", "Service.csv"]
