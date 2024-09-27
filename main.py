@@ -6,7 +6,7 @@ import sys
 from job_notifications import create_notifications
 import numpy as np
 import pandas as pd
-from sqlsorcery import MSSQL
+from slugify import slugify
 
 from ftp import FTP
 from mailer import Mailer
@@ -50,7 +50,7 @@ def get_files_from_ftp(ftp):
     logging.info(f"{len(filenames)} files downloaded. ")
 
 
-def read_files_into_df(file_name):
+def get_file_paths_and_rename(schools, file_name):
     """
     Given the file name (eg. Student or Service), read the files and concat into one DataFrame.
 
@@ -60,16 +60,13 @@ def read_files_into_df(file_name):
     Return:
         DataFrame: combined data from all files with the same name (ie. same type of data)
     """
-    dfs = []
+    files = []
     for school in schools:
-        path = os.path.join(LOCAL_DIR, f"{school}_{file_name}.csv")
-        df = pd.read_csv(
-            path, sep=",", quotechar='"', doublequote=True, dtype=str, header=0
-        )
-        dfs.append(df)
-    merged = pd.concat(dfs)
-    merged.replace(np.nan, "", regex=True, inplace=True)
-    return merged
+        source_path = os.path.join(LOCAL_DIR, f"{school}_{file_name}.csv")
+        dest_path = os.path.join(LOCAL_DIR, f"{slugify(school)}_{file_name}.csv")
+        os.rename(source_path, dest_path)
+        files.append(dest_path)
+    return files
 
 
 def insert_df_into_db(df, table_name):
@@ -89,13 +86,12 @@ def insert_df_into_db(df, table_name):
 
 
 def main():
-    config.set_logging()
-    connector = Connector()
     ftp = FTP()
     remove_local_files()
     get_files_from_ftp(ftp)
-    students = connector.read_files_into_df("Student")
-    services = connector.read_files_into_df("Service")
+    school_dir_names = ftp.get_directory_names(REMOTE_DIR)
+    student_files = get_file_paths_and_rename(school_dir_names, "Student")
+    service_files = get_file_paths_and_rename(school_dir_names, "Service")
     connector.insert_df_into_db(students, "Students")
     connector.insert_df_into_db(services, "Services")
 
