@@ -8,6 +8,7 @@ verify_ssl = true
 [packages]
 sqlsorcery = {extras = ["mssql"], version = "*"}
 pysftp = "*"
+job-notifications = "*"
 
 [requires]
 python_version = "3.8"
