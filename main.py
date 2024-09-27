@@ -3,6 +3,7 @@ import traceback
 import os
 import sys
 
+from gbq-connector import CloudStorageClient
 from job_notifications import create_notifications
 from slugify import slugify
 
@@ -41,7 +42,7 @@ def get_files_from_ftp(ftp):
     logging.info(f"{len(filenames)} files downloaded. ")
 
 
-def get_file_paths_and_rename(schools, file_name):
+def get_file_paths_and_rename(schools, file_kind):
     """
     Given the file name (eg. Student or Service), read the files and concat into one DataFrame.
 
@@ -51,16 +52,17 @@ def get_file_paths_and_rename(schools, file_name):
     Return:
         DataFrame: combined data from all files with the same name (ie. same type of data)
     """
-    files = []
+    files = {}
     for school in schools:
-        source_path = os.path.join(LOCAL_DIR, f"{school}_{file_name}.csv")
-        dest_path = os.path.join(LOCAL_DIR, f"{slugify(school)}_{file_name}.csv")
+        source_path = os.path.join(LOCAL_DIR, f"{school}_{file_kind}.csv")
+        new_file_name = f"{slugify(school, separator='_')}_{file_kind}"
+        dest_path = os.path.join(LOCAL_DIR, f"{new_file_name}.csv")
         os.rename(source_path, dest_path)
-        files.append(dest_path)
+        files[new_file_name] = dest_path
     return files
 
 
-def insert_df_into_db(df, table_name):
+def insert_df_into_cloud(files, sub_folder):
     """
     Insert DataFrame into database with given table name.
 
@@ -71,9 +73,11 @@ def insert_df_into_db(df, table_name):
     Return:
         none
     """
-    table = f"{self.table_prefix}_{table_name}"
-    self.sql.insert_into(table, df, if_exists="replace")
-    logging.info(f"Inserted {len(df)} records into {table}.")
+    bucket = os.getenv("BUCKET")
+    cloud_conn = CloudStorageClient()
+    for file, file_path in files:
+        blob = f"seis/{sub_folder}/{file}.csv"
+        cloud_conn.load_file_to_cloud(bucket, blob, file_path)
 
 
 def main():
@@ -83,8 +87,8 @@ def main():
     school_dir_names = ftp.get_directory_names(REMOTE_DIR)
     student_files = get_file_paths_and_rename(school_dir_names, "Student")
     service_files = get_file_paths_and_rename(school_dir_names, "Service")
-    connector.insert_df_into_db(students, "Students")
-    connector.insert_df_into_db(services, "Services")
+    insert_df_into_cloud(student_files, "students")
+    insert_df_into_cloud(service_files, "services")
 
 
 if __name__ == "__main__":
