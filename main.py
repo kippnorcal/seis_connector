@@ -4,12 +4,9 @@ import os
 import sys
 
 from job_notifications import create_notifications
-import numpy as np
-import pandas as pd
 from slugify import slugify
 
 from ftp import FTP
-from mailer import Mailer
 
 """Configure logging level and outputs"""
 logging.basicConfig(
@@ -27,12 +24,6 @@ LOCAL_DIR = "files"
 REMOTE_DIR = "seis"
 
 notifications = create_notifications("SEIS Connector", "Mailgun", "app.log")
-
-
-def __init__(self):
-    self.sql = MSSQL()
-    self.ftp = FTP()
-    self.schools = self.ftp.get_directory_names(self.remotedir)
 
 
 def remove_local_files():

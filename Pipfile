@@ -6,10 +6,10 @@ verify_ssl = true
 [dev-packages]
 
 [packages]
-sqlsorcery = {extras = ["mssql"], version = "*"}
 pysftp = "*"
 job-notifications = "*"
 python-slugify = "*"
+gbq-connector = "*"
 
 [requires]
-python_version = "3.8"
+python_version = "3.12"
