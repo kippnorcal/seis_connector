@@ -2,9 +2,11 @@ import logging
 import traceback
 import os
 import sys
+from typing import Dict
 
-from gbq-connector import CloudStorageClient
+from gbq_connector import CloudStorageClient
 from job_notifications import create_notifications
+import pandas as pd
 from slugify import slugify
 
 from ftp import FTP
@@ -35,14 +37,14 @@ def remove_local_files():
             os.remove(os.path.join(LOCAL_DIR, filename))
 
 
-def get_files_from_ftp(ftp):
+def get_files_from_ftp(ftp, dir_names, file_names):
     """Loop through all sub-folders and download files from FTP."""
-    ftp.download_all(REMOTE_DIR, LOCAL_DIR)
+    ftp.download_all(REMOTE_DIR, LOCAL_DIR, dir_names, file_names)
     filenames = [f for f in os.listdir(LOCAL_DIR) if f.endswith(".csv")]
     logging.info(f"{len(filenames)} files downloaded. ")
 
 
-def get_file_paths_and_rename(schools, file_kind):
+def get_file_paths_and_rename(schools: list, file_kind: str) -> Dict[str, str]:
     """
     Given the file name (eg. Student or Service), read the files and concat into one DataFrame.
 
@@ -62,7 +64,7 @@ def get_file_paths_and_rename(schools, file_kind):
     return files
 
 
-def insert_df_into_cloud(files, sub_folder):
+def insert_df_into_cloud(files: dict, sub_folder: str) -> None:
     """
     Insert DataFrame into database with given table name.
 
@@ -75,18 +77,33 @@ def insert_df_into_cloud(files, sub_folder):
     """
     bucket = os.getenv("BUCKET")
     cloud_conn = CloudStorageClient()
-    for file, file_path in files:
+    f_count = 0
+    f_amount = len(files)
+    print(type(files))
+    for file, file_path in files.items():
+        f_count += 1
+        logging.info(f"Loading {f_count} of {f_amount}: {file}")
+        df = pd.read_csv(file_path, dtype=str)
         blob = f"seis/{sub_folder}/{file}.csv"
-        cloud_conn.load_file_to_cloud(bucket, blob, file_path)
+        cloud_conn.load_dataframe_to_cloud_as_csv(bucket, blob, df)
 
 
 def main():
     ftp = FTP()
+    logging.info("Removing old files from sftp server")
     remove_local_files()
-    get_files_from_ftp(ftp)
+
+    logging.info("Fetching files from sftp server")
+    file_names = ["Student.csv", "Service.csv"]
     school_dir_names = ftp.get_directory_names(REMOTE_DIR)
+    get_files_from_ftp(ftp, school_dir_names, file_names)
+
     student_files = get_file_paths_and_rename(school_dir_names, "Student")
+    logging.info(f"Found {len(student_files)} student csv files.")
     service_files = get_file_paths_and_rename(school_dir_names, "Service")
+    logging.info(f"Found {len(service_files)} service csv files.")
+
+    logging.info("Connecting to cloud storage")
     insert_df_into_cloud(student_files, "students")
     insert_df_into_cloud(service_files, "services")
 
