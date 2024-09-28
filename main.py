@@ -9,7 +9,7 @@ from job_notifications import create_notifications
 import pandas as pd
 from slugify import slugify
 
-from ftp import FTP
+from ftpconnection import FTPConnection
 
 """Configure logging level and outputs"""
 logging.basicConfig(
@@ -89,7 +89,7 @@ def insert_df_into_cloud(files: dict, sub_folder: str) -> None:
 
 
 def main():
-    ftp = FTP()
+    ftp = FTPConnection()
     logging.info("Removing old files from sftp server")
     remove_local_files()
 

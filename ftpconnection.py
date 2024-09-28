@@ -9,7 +9,7 @@ FTP_USER = os.getenv("FTP_USER")
 FTP_PWD = os.getenv("FTP_PWD")
 
 
-class FTP:
+class FTPConnection:
     """
     An FTP server connection object for downloading and managing files on an FTP server.
     """
