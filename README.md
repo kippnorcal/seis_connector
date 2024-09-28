@@ -1,5 +1,5 @@
 # seis_connector
-ETL pipeline that pulls student demographic and services data from SEIS ([Special Education Information System](https://www.sjcoe.org/CodeStack/SEIS.aspx)) into the data warehouse. This code does a full truncate and reload of the database tables and does not track changes over time.
+ETL pipeline that downloads student demographic and services files from an FTP server connected to SEIS ([Special Education Information System](https://www.sjcoe.org/CodeStack/SEIS.aspx)). Files are loaded into Google Cloud Storage.
 
 ## Pre-requisites:
 This connector iteratively pulls files from an SFTP server. In order to use this code, you will need to have an SFTP server that is already set up and contains the SEIS files.
@@ -10,7 +10,7 @@ Note: SEIS drops three different file formats with the same data (.csv, .txt, .x
 
 ## Dependencies:
 
-- Python3.8
+- Python3
 - [Pipenv](https://pipenv.readthedocs.io/en/latest/)
 - [Docker](https://www.docker.com/)
 
@@ -29,26 +29,22 @@ git clone https://github.com/kippnorcal/seis_connector.git
 The environment file should fit the following template:
 
 ```
-# Database variables
-DB_SERVER=
-DB=
-DB_USER=
-DB_PWD=
-DB_SCHEMA=
+# Google Cloud Credentials
+GOOGLE_APPLICATION_CREDENTIALS=
+GBQ_PROJECT=
+BUCKET=
 
 # FTP variables
 FTP_HOST=
 FTP_USER=
 FTP_PWD=
 
-# Email Credentials (Optional)
-ENABLE_MAILER=1
-SENDER_EMAIL=
-SENDER_PWD=
-RECIPIENT_EMAIL=
-
-# Enable Debug Logging (Optional)
-DEBUG=1
+# Email Credentials
+FROM_ADDRESS=
+TO_ADDRESS=
+MG_API_KEY=
+MG_API_URL=
+MG_DOMAIN=
 ```
 
 ## Build the Docker image

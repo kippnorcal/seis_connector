@@ -39,16 +39,15 @@ class FTPConnection:
         """
         return self.ftpsrv.listdir(remote_dir_path)
 
-    def download_all(self, remote_dir_path: str, local_dir_path: str, sub_dir_names: List[str], file_names: List[str] -> None):
+    def download_all(
+            self,
+            remote_dir_path: str,
+            local_dir_path: str,
+            sub_dir_names: List[str],
+            file_names: List[str]
+    ) -> None:
         """
         Loop through all sub-directories and download the files defined in init.
-
-        Params:
-            remotedir (str): path of the remote directory.
-            localdir (str): path of the local directory.
-
-        Return:
-            none
         """
         for school in sub_dir_names:
             for file_name in file_names:

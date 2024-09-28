@@ -3,6 +3,7 @@ import traceback
 import os
 import sys
 from typing import Dict
+from typing import List
 
 from gbq_connector import CloudStorageClient
 from job_notifications import create_notifications
@@ -29,16 +30,20 @@ REMOTE_DIR = "seis"
 notifications = create_notifications("SEIS Connector", "Mailgun", "app.log")
 
 
-def remove_local_files():
-    """Remove any leftover files from local project directory."""
+def remove_local_files() -> None:
+    """
+    Remove any leftover files from local project directory.
+    """
     filelist = [f for f in os.listdir(LOCAL_DIR)]
     for filename in filelist:
         if "gitkeep" not in filename:
             os.remove(os.path.join(LOCAL_DIR, filename))
 
 
-def get_files_from_ftp(ftp, dir_names, file_names):
-    """Loop through all sub-folders and download files from FTP."""
+def get_files_from_ftp(ftp: FTPConnection, dir_names: List[str], file_names: List[str]) -> None:
+    """
+    Downloads all the files from the SFTP server and loops through the files to find all CSV files
+    """
     ftp.download_all(REMOTE_DIR, LOCAL_DIR, dir_names, file_names)
     filenames = [f for f in os.listdir(LOCAL_DIR) if f.endswith(".csv")]
     logging.info(f"{len(filenames)} files downloaded. ")
@@ -46,13 +51,8 @@ def get_files_from_ftp(ftp, dir_names, file_names):
 
 def get_file_paths_and_rename(schools: list, file_kind: str) -> Dict[str, str]:
     """
-    Given the file name (eg. Student or Service), read the files and concat into one DataFrame.
-
-    Params:
-        file_name (str): name of the file that you are trying to combine.
-
-    Return:
-        DataFrame: combined data from all files with the same name (ie. same type of data)
+    Loops through the school names from the SFTP server, and will rename each file. Returns a dictionary with a key
+    pair value of file name, file path.
     """
     files = {}
     for school in schools:
@@ -66,14 +66,7 @@ def get_file_paths_and_rename(schools: list, file_kind: str) -> Dict[str, str]:
 
 def insert_df_into_cloud(files: dict, sub_folder: str) -> None:
     """
-    Insert DataFrame into database with given table name.
-
-    Params:
-        df (DataFrame): data to insert into the database.
-        table_name (str): name of the database table that you want to update.
-
-    Return:
-        none
+    Converts CSV file to DataFrame and saves to Google Cloud Storage.
     """
     bucket = os.getenv("BUCKET")
     cloud_conn = CloudStorageClient()
