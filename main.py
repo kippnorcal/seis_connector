@@ -2,6 +2,7 @@ import logging
 import traceback
 import os
 
+from job_notifications import create_notifications
 import numpy as np
 import pandas as pd
 from sqlsorcery import MSSQL
@@ -10,6 +11,17 @@ import config
 from ftp import FTP
 from mailer import Mailer
 
+notifications = create_notifications("SEIS Connector", mail_service="mailgun", logs="app.log")
+
+logging.basicConfig(
+    handlers=[
+        logging.FileHandler(filename="app.log", mode="w+"),
+        logging.StreamHandler(sys.stdout),
+    ],
+    level=logging.INFO,
+    format="%(asctime)s | %(levelname)s: %(message)s",
+    datefmt="%Y-%m-%d %I:%M:%S%p",
+)
 
 class Connector:
     """
@@ -89,9 +101,8 @@ def main():
 if __name__ == "__main__":
     try:
         main()
-        error_message = None
+        notifications.notify()
     except Exception as e:
         logging.exception(e)
         error_message = traceback.format_exc()
-    if config.ENABLE_MAILER:
-        Mailer("SEIS Connector").notify(error_message=error_message)
+        notifications.notify(error_message=error_message)
