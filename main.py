@@ -1,6 +1,7 @@
 import logging
 import traceback
 import os
+import sys
 
 from job_notifications import create_notifications
 import numpy as np
