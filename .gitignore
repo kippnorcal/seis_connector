@@ -130,3 +130,6 @@ dmypy.json
 
 # Project files
 *.csv
+*.json
+.idea
+.DS_Store
