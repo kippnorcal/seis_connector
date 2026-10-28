@@ -1,12 +1,15 @@
 import os
 from typing import List
 
-import pysftp
+import paramiko
 
 
 FTP_HOST = os.getenv("FTP_HOST")
+FTP_PORT = int(os.getenv("FTP_PORT", 22))
 FTP_USER = os.getenv("FTP_USER")
 FTP_PWD = os.getenv("FTP_PWD")
+HOST_KEYS_PATH = ""
+CONNECTION_TIMEOUT = 30
 
 
 class FTPConnection:
@@ -16,16 +19,36 @@ class FTPConnection:
 
     def __init__(self):
         """
-        Initialize FTP connection using pysftp.
+        Initialize SFTP connection using paramiko. The server's host key must be present in the
+        known hosts file at HOST_KEYS_PATH, otherwise the connection is rejected.
         """
-        self.cnopts = pysftp.CnOpts()
-        self.cnopts.hostkeys = None
-        self.ftpsrv = pysftp.Connection(
-            host=FTP_HOST,
+        self.client = paramiko.SSHClient()
+        self.client.load_host_keys(HOST_KEYS_PATH)
+        self.client.set_missing_host_key_policy(paramiko.RejectPolicy())
+        self.client.connect(
+            hostname=FTP_HOST,
+            port=FTP_PORT,
             username=FTP_USER,
             password=FTP_PWD,
-            cnopts=self.cnopts,
+            timeout=CONNECTION_TIMEOUT,
+            banner_timeout=CONNECTION_TIMEOUT,
+            look_for_keys=False,
+            allow_agent=False,
         )
+        self.ftpsrv = self.client.open_sftp()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, exc_traceback):
+        self.close()
+
+    def close(self) -> None:
+        """
+        Close the SFTP session and the underlying SSH connection.
+        """
+        self.ftpsrv.close()
+        self.client.close()
 
     def get_directory_names(self, remote_dir_path: str) -> List[str]:
         """
@@ -54,5 +77,4 @@ class FTPConnection:
                 self.ftpsrv.get(
                     f"{remote_dir_path}/{school}/{file_name}",
                     f"{local_dir_path}/{school}_{file_name}",
-                    preserve_mtime=True,
                 )
