@@ -36,6 +36,7 @@ BUCKET=
 
 # FTP variables
 FTP_HOST=
+FTP_PORT=  # optional, defaults to 22
 FTP_USER=
 FTP_PWD=
 
@@ -46,6 +47,10 @@ MG_API_KEY=
 MG_API_URL=
 MG_DOMAIN=
 ```
+
+3. Mount the SFTP server's host keys
+
+The connection verifies the SFTP server's identity against a known_hosts file and rejects any server whose key is not listed. Mount that file into the container and set `HOST_KEYS_PATH` in `ftpconnection.py` to its path inside the container.
 
 ## Build the Docker image
 

@@ -82,14 +82,14 @@ def insert_df_into_cloud(files: dict, sub_folder: str) -> None:
 
 
 def main():
-    ftp = FTPConnection()
     logging.info("Removing old files from sftp server")
     remove_local_files()
 
     logging.info("Fetching files from sftp server")
     file_names = ["Student.csv", "Service.csv"]
-    school_dir_names = ftp.get_directory_names(REMOTE_DIR)
-    get_files_from_ftp(ftp, school_dir_names, file_names)
+    with FTPConnection() as ftp:
+        school_dir_names = ftp.get_directory_names(REMOTE_DIR)
+        get_files_from_ftp(ftp, school_dir_names, file_names)
 
     student_files = get_file_paths_and_rename(school_dir_names, "Student")
     logging.info(f"Found {len(student_files)} student csv files.")

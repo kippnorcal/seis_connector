@@ -6,11 +6,11 @@ verify_ssl = true
 [dev-packages]
 
 [packages]
-pysftp = "*"
+paramiko = ">=3.4"
 pandas = "*"
 job-notifications = "*"
 python-slugify = "*"
 gbq-connector = "*"
 
 [requires]
-python_version = "3.12"
+python_version = "3.14"
